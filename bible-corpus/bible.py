@@ -7,6 +7,7 @@ except ImportError:
 
 from collections import OrderedDict
 
+
 old_testament = OrderedDict({
                             "b.GEN" : "Genesis ",
                             "b.EXO" : "Exodus ",
@@ -107,6 +108,16 @@ class Verse(object):
     def __str__(self, *args, **kwargs):
         return self.text
     
+    def unique_chars(self):
+        return set(list(self.text))
+    
+    def char_frequency(self):
+        res = {}
+        chars = list(self.text)
+        for char in chars:
+            res[char] = res.get(char, 0) + 1
+        return res
+            
 
 class Chapter(object):
     
@@ -129,6 +140,21 @@ class Chapter(object):
                                                 self._id,
                                                 len(self.verses)
                                                 )
+        
+    def unique_chars(self):
+        res = set({})
+        for verse in self.verses:
+            res = res.union(verse.unique_chars())
+        return res
+    
+    def char_frequency(self):
+        res = {}
+        for verse in self.verses:
+            partial_freq = verse.char_frequency()
+            for key in partial_freq.keys():
+                res[key] = res.get(key, 0) + partial_freq[key]
+        return res
+
 
 class Book(object):
     
@@ -148,6 +174,20 @@ class Book(object):
         return "Book {0} ({1}) with {2} chapters".format(all_books[self._id],
                                                    self._id,
                                                    len(self.chapters))
+        
+    def unique_chars(self):
+        res = set({})
+        for chapter in self.chapters:
+            res = res.union(chapter.unique_chars())
+        return res
+    
+    def char_frequency(self):
+        res = {}
+        for chapter in self.chapters:
+            partial_freq = chapter.char_frequency()
+            for key in partial_freq.keys():
+                res[key] = res.get(key, 0) + partial_freq[key]
+        return res
 
 
 class BookSet(object):
@@ -163,6 +203,19 @@ class BookSet(object):
         self._all_books_idx = []
         
         self.ids = self._all_books.keys()
+        
+        self._iter_idx = 0
+    
+    def __iter__(self):
+        return self
+    
+    def __next__(self):
+        try:
+            self._iter_idx += 1
+            return self._all_books_idx[self._iter_idx - 1]
+        except:
+            self._iter_idx = 0
+            raise StopIteration
     
     def __getitem__(self, value):
         if isinstance(value, int) or\
@@ -234,6 +287,20 @@ class Bible(object):
     
     def get_new_testament(self):
         return self.books._new_testament_idx
+    
+    def unique_chars(self):
+        res = set({})
+        for book in self.books:
+            res = res.union(book.unique_chars())
+        return res
+    
+    def char_frequency(self):
+        res = {}
+        for book in self.books:
+            partial_freq = book.char_frequency()
+            for key in partial_freq.keys():
+                res[key] = res.get(key, 0) + partial_freq[key]
+        return res
 
     def __repr__(self, *args, **kwargs):
         return "{0} (iso639={1}, {2})".format(self.language,
