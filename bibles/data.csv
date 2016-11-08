@@ -1,0 +1,107 @@
+ISO 639-3;Language;Family;Genus;Subgenus;Speakers;Script;Parts
+acu;Achuar-Shiwiar;Jivaroan;;;5000;Latin;New Testament
+afr;Afrikaans;Indo-European;Germanic;West;5000000;Latin;COMPLETE
+agr;Aguaruna;Jivaroan;;;38300;Latin;New Testament
+ake;Akawaio;Carib;Northern;East-West Guiana;4500;Latin;New Testament
+als;Albanian;Indo-European;Albanian;Tosk;3000000;Latin;COMPLETE
+amh;Amharic;Afro-Asiatic;Semitic;South;17500000;Ethiopic;New Testament
+amu;Amuzgo;Oto-Manguean;Amuzgoan;;23000;Latin;New Testament
+arb;Arabic;Afro-Asiatic;Semitic;Central;206000000;Arabic;COMPLETE
+hye;Armenian;Indo-European;Armenian;;6400000;Armenian;Gen. Exod. Gosp.
+djk;Aukan;Creole;English based;Atlantic;15500;Latin;New Testament
+bsn;Barasana-Eduria;Tucanoan;Eastern Tucanoan;Central;1890;Latin;New Testament
+eus;Basque;Basque;;;700000;Latin;New Testament
+bul;Bulgarian;Indo-European;Slavic;South;9000000;Cyrillic;COMPLETE
+cjp;Cabécar;Chibchan;Talamanca;;8840;Latin;New Testament
+cak;Cakchiquel;Mayan;Quichean;Greater Quichean;132000;Latin;New Testament
+cni;Campa (Asháninka);Arawakan;Maipuran;Southern Maipuran;26100;Latin;New Testament
+kbh;Camsá;Equatorial (?);;;4770;Latin;New Testament
+ceb;Cebuano;Austronesian;Malayo-Polynesian;Phillipine;15800000;Latin;COMPLETE
+cha;Chamorro;Austronesian;Malayo-Polynesian;Chamorro;92000;Latin;Psalm Gosp. Acts
+chr;Cherokee;Iroquoian;Southern Iroquoian;;16400;Cherokee;New Testament
+chq;Chinantec (Quiotepec);Oto-Manguean;Chinantecan;;8000;Latin;New Testament
+cmn;Chinese;Sino-Tibetan;Sinitic;Chinese;840000000;Chinese;COMPLETE
+↳  ;Chinese (tokenised) [Tokenisation by Armin Hoenen, using Stanford Word Segmenter 3.5.2] ;;;;;;
+cop;Coptic;Afro-Asiatic;Egyptian;;Extinct;Coptic;New Testament
+crp;Creole (Haitian);Indo-European;Italic;Romance;9600000;Latin;COMPLETE
+hrv;Croatian;Indo-European;Slavic;South;5500000;Latin;COMPLETE
+ces;Czech;Indo-European;Slavic;West;9500000;Latin;COMPLETE
+dan;Danish;Indo-European;Germanic;North;5500000;Latin;COMPLETE
+dik;Dinka;Nilo-Saharan;Eastern Sudanic;Nilotic;450000;Latin;New Testament
+nld;Dutch;Indo-European;Germanic;West;15700000;Latin;COMPLETE
+eng;English;Indo-European;Germanic;West;328000000;Latin;COMPLETE
+↳  ;English (WEB tranlation) [Added by Stephen Mayhew] ;;;;;;
+epo;Esperanto;Constructed;;;1000;Latin;COMPLETE
+est;Estonian;Uralic;Finno-Ugric;Finno-Permic;1000000;Latin;COMPLETE
+ewe;Ewe;Niger-Congo;Atlantic-Congo;Volta-Congo;2250000;Latin;New Testament
+pes;Farsi (Persian);Indo-European;Indo-Iranian;Iranian;22000000;Arabic;COMPLETE
+fin;Finnish;Uralic;Finno-Ugric;Finno-Permic;5000000;Latin;COMPLETE
+fra;French;Indo-European;Italic;Romance;58000000;Latin;COMPLETE
+gla;Gaelic (Scottish);Indo-European;Celtic;Insular;67000;Latin;Gospel of Mark
+gbi;Galela;West Papuan;North Halmahera;Galela-Loloda;79000;Latin;New Testament
+deu;German;Indo-European;Germanic;West;90300000;Latin;COMPLETE
+ell;Greek;Indo-European;Greek;Attic;13000000;Greek;COMPLETE
+guj;Gujarati;Indo-European;Indo-Iranian;Indo-Aryan;45500000;Gujarati;New Testament
+heb;Hebrew;Afro-Asiatic;Semitic;Central;5300000;Hebrew;COMPLETE
+hin;Hindi;Indo-European;Indo-Iranian;Indo-Aryan;180000000;Devanagari;COMPLETE
+hun;Hungarian;Uralic;Finno-Ugric;Ugric;12500000;Latin;COMPLETE
+isl;Icelandic;Indo-European;Germanic;North;230000;Latin;COMPLETE
+ind;Indonesian;Austronesian;Malayo-Polynesian;Malayo-Sumbawan;23100000;Latin;COMPLETE
+ita;Italian;Indo-European;Italic;Romance;61700000;Latin;COMPLETE
+jai;Jakalteko;Mayan;Kanjobalan-Chujean;Kanjobalan;77700;Latin;New Testament
+jpn;Japanese;Japonic;;;122000000;Kanjii;COMPLETE
+↳  ;Japanese (tokenised) [Tokenisation by Armin Hoenen, using kyTea 0.4.7] ;;;;;;
+quc;K'iche';Mayan;Quichean-Mamean;Greater Quichean;1900000;Latin;New Testament
+kab;Kabyle;Afro-Asiatic;Berber;Northern;3100000;Latin;New Testament
+kan;Kannada;Dravidian;Southern;Tamil-Kannada;35300000;Kannada;COMPLETE
+kor;Korean;Altaic(?);;;66300000;Hangul;COMPLETE
+lat;Latin;Indo-European;Italic;Latino-Faliscan;Extinct;Latin;COMPLETE
+lav;Latvian;Indo-European;Baltic;Eastern;1500000;Latin;New Testament
+lit;Lithuanian;Indo-European;Baltic;Eastern;3100000;Latin;COMPLETE
+dop;Lukpa;Niger-Congo;Atlantic-Congo;Volta-Congo;50000;Latin;New Testament
+plt;Malagasy;Austronesian;Malayo-Polynesian;Greater Barito;7520000;Latin;COMPLETE
+mal;Malayalam;Dravidian;Southern;Tamil-Kannada;35400000;Malayalam;COMPLETE
+mam;Mam;Mayan;Quichean-Mamean;Greater Mamean;200000;Latin;New Testament
+glv;Manx;Indo-European;Celtic;Insular;77000;Latin;Esth. Jonah Gosp.
+mri;Maori;Austronesian;Malayo-Polynesian;Central-Eastern;60000;Latin;COMPLETE
+mar;Marathi;Indo-European;Indo-Iranian;Indo-Aryan;68000000;Devanagari;COMPLETE
+mya;Myanmar (Burmese);Sino-Tibetan;Tibeto-Burman;Lolo-Burmese;32300000;Myanmar;COMPLETE
+nhg;Nahuatl (Tetelcingo);Uto-Aztecan;Southern Uto-Aztecan;Aztecan;3500;Latin;New Testament
+nep;Nepali;Indo-European;Indo-Iranian;Indo-Aryan;11100000;Devanagari;COMPLETE
+nor;Norwegian;Indo-European;Germanic;North;4600000;Latin;COMPLETE
+ojb;Ojibwa;Algic;Algonquian;Central;20000;Aboriginal Syllabics;New Testament
+pck;Paite (Chin);Sino-Tibetan;Tibeto-Burman;Kuki-Chin-Naga;78800;Latin;COMPLETE
+pol;Polish;Indo-European;Slavic;West;36600000;Latin;COMPLETE
+por;Portuguese;Indo-European;Italic;Romance;178000000;Latin;COMPLETE
+pot;Potawatomi;Algic;Algonquian;Central;1300000;Latin;Matthew Acts
+kek;Q'eqchi';Mayan;Quichean-Mamean;Greater Quichean;400000;Latin;COMPLETE
+quw;Quichua;Quechuan;Quechua II;B;20000;Latin;New Testament
+rmn;Romani;Indo-European;Indo-Iranian;Indo-Aryan;710000;Latin;New Testament
+ron;Romanian;Indo-European;Italic;Romance;23400000;Latin;COMPLETE
+rus;Russian;Indo-European;Slavic;East;143000000;Cyrillic;COMPLETE
+srp;Serbian;Indo-European;Slavic;South;7000000;Latin;COMPLETE
+jiv;Shuar (Jivaro);Jivaroan;;;46700;Latin;New Testament
+slk;Slovak;Indo-European;Slavic;West;4610000;Latin;COMPLETE
+slv;Slovene;Indo-European;Slavic;South;1730000;Latin;COMPLETE
+som;Somali;Afro-Asiatic;Cushitic;East;8340000;Latin;COMPLETE
+spa;Spanish;Indo-European;Italic;Romance;328000000;Latin;COMPLETE
+swh;Swahili;Niger-Congo;Atlantic-Congo;Volta-Congo;788000;Latin;New Testament
+swe;Swedish;Indo-European;Germanic;North;8300000;Latin;COMPLETE
+arc;Syriac;Afro-Asiatic;Semitic;Central;Extinct;Syriac;New Testament
+shi;Tachelhit;Afro-Asiatic;Berber;Northern;3000000;Latin;New Testament
+tgl;Tagalog;Austronesian;Malayo-Polynesian;Phillipine;23900000;Latin;COMPLETE
+ttq;Tamajaq (Tuareg);Afro-Asiatic;Berber;Tamasheq;640000;Latin;Portions
+tel;Telugu;Dravidian;South-Central;Telugu;69600000;Telugu;COMPLETE
+tha;Thai;Tai-Kadai;Kam-Tai;Be-Tai;20300000;Thai;COMPLETE
+↳  ;Thai (tokenised) [Tokenisation by Armin Hoenen, using java.text.BreakIterator with locale TH] ;;;;;;
+tur;Turkish;Altaic;Turkic;Southern;50000000;Latin;COMPLETE
+ukr;Ukranian;Indo-European;Slavic;East;37000000;Cyrillic;New Testament
+ppk;Uma;Austronesian;Malayo-Polynesian;Celebic;20000;Latin;New Testament
+usp;Uspanteco;Mayan;Quichean-Mamean;Greater Quichean;3000;Latin;New Testament
+vie;Vietnamese;Austro-Asiatic;Mon-Khmer;Viet-Muong;68600000;Latin;COMPLETE
+↳  ;Vietnamese (tokenised) [Tokenisation by Armin Hoenen, using vnTokenizer 4.1.1] ;;;;;;
+wal;Wolaytta;Afro-Asiatic;Omotic;North;1230000;Latin;New Testament
+wol;Wolof;Niger-Congo;Atlantic-Congo;Atlantic;4000000;Latin;New Testament
+xho;Xhosa;Niger-Congo;Atlantic-Congo;Volta-Congo;7800000;Latin;COMPLETE
+dje;Zarma;Nilo-Saharan;Songhai;Southern;2350000;Latin;COMPLETE
+zul;Zulu;Niger-Congo;Atlantic-Congo;Volta-Congo;9980000;Latin;New Testament
