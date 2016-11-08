@@ -255,6 +255,15 @@ class Bible(object):
         xml_root = self._xml_tree.getroot()
         xml_header, xml_text = xml_root.getchildren()
         
+        content_info = xml_header.find("fileDesc"
+                                       ).find("extent")
+        
+        for child in content_info:
+            if child.tag == "wordCount":
+                self.reported_word_count = int(child.text)
+            else:
+                self.byte_count = int(child.text)
+        
         language_info = xml_header.find("profileDesc"
                                         ).find("langUsage"
                                                ).find("language")
