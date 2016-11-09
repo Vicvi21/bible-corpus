@@ -111,7 +111,10 @@ class Verse(object):
         return self.text
     
     def tokenize(self):
-        temp_text = re.sub(r'[^\w\s]','',self.text).lower()
+        temp_text = re.sub(r'[^\w\s]', 
+                           '', 
+                           self.text, 
+                           re.UNICODE).lower()
         return temp_text.split(" ")
     
     def unique_tokens(self):
@@ -135,7 +138,10 @@ class Verse(object):
         return res
     
     def token_count(self):
-        return len(self.tokenize())
+        temp = self.tokenize()
+        while '' in temp:
+            temp.remove('')
+        return len(temp)
     
 
 class Chapter(object):
@@ -372,7 +378,7 @@ class Bible(object):
     
     def unique_tokens(self, *book_ids):
         res = set({})
-        for book in self.books.books_ith_id(*book_ids):
+        for book in self.books.books_with_id(*book_ids):
             res = res.union(book.unique_tokens())
         return res
     
