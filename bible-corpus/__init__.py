@@ -14,8 +14,9 @@ bibles = []
 i = 0
 for _, _, filenames in os.walk(source_dir):
     for filename in filenames:
-        new_bible = Bible(source_dir + filename)
-        bible_stats = BibleStatistics(new_bible)
+        new_bible = Bible.from_path(source_dir + filename)
+        if len(new_bible) > 27:
+            new_bible = new_bible.get_new_testament()
         bibles.append(new_bible)
         print("({0}) Counted toks: {1}, Reported: {2}".format(
                                                 new_bible.language,
