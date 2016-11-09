@@ -6,79 +6,81 @@ except ImportError:
     import xml.etree.ElementTree as ET
 
 from collections import OrderedDict
+import operator
+import re
 
 
-old_testament = OrderedDict({
-                            "b.GEN" : "Genesis ",
-                            "b.EXO" : "Exodus ",
-                            "b.LEV" : "Leviticus ",
-                            "b.NUM" : "Numbers ",
-                            "b.DEU" : "Deuteronomy ",
-                            "b.JOS" : "Joshua ",
-                            "b.JDG" : "Judges ",
-                            "b.RUT" : "Ruth ",
-                            "b.1SA" : "1 Samuel ",
-                            "b.2SA" : "2 Samuel ",
-                            "b.1KI" : "1 Kings ",
-                            "b.2KI" : "2 Kings ",
-                            "b.1CH" : "1 Chronicles ",
-                            "b.2CH" : "2 Chronicles ",
-                            "b.EZR" : "Ezra ",
-                            "b.NEH" : "Nehemiah ",
-                            "b.EST" : "Esther ",
-                            "b.JOB" : "Job ",
-                            "b.PSA" : "Psalms ",
-                            "b.PRO" : "Proverbs ",
-                            "b.ECC" : "Ecclesiastes ",
-                            "b.SON" : "Song of Solomon ",
-                            "b.ISA" : "Isaiah ",
-                            "b.JER" : "Jeremiah ",
-                            "b.LAM" : "Lamentations ",
-                            "b.EZE" : "Ezekiel",
-                            "b.DAN" : "Daniel ",
-                            "b.HOS" : "Hosea",
-                            "b.JOE" : "Joel",
-                            "b.AMO" : "Amos",
-                            "b.OBA" : "Obadiah",
-                            "b.JON" : "Jonah",
-                            "b.MIC" : "Micah",
-                            "b.NAH" : "Nahum",
-                            "b.HAB" : "Habakkuk",
-                            "b.ZEP" : "Zephaniah",
-                            "b.HAG" : "Haggai",
-                            "b.ZEC" : "Zechariah",
-                            "b.MAL" : "Malachi"
-                            })
+old_testament = OrderedDict([
+                             ("b.GEN", "Genesis"),
+                             ("b.EXO", "Exodus"),
+                             ("b.LEV", "Leviticus"),
+                             ("b.NUM", "Numbers"),
+                             ("b.DEU", "Deuteronomy"),
+                             ("b.JOS", "Joshua"),
+                             ("b.JDG", "Judges"),
+                             ("b.RUT", "Ruth"),
+                             ("b.1SA", "1 Samuel"),
+                             ("b.2SA", "2 Samuel"),
+                             ("b.1KI", "1 Kings"),
+                             ("b.2KI", "2 Kings"),
+                             ("b.1CH", "1 Chronicles"),
+                             ("b.2CH", "2 Chronicles"),
+                             ("b.EZR", "Ezra"),
+                             ("b.NEH", "Nehemiah"),
+                             ("b.EST", "Esther"),
+                             ("b.JOB", "Job"),
+                             ("b.PSA", "Psalms"),
+                             ("b.PRO", "Proverbs"),
+                             ("b.ECC", "Ecclesiastes"),
+                             ("b.SON", "Song of Solomon"),
+                             ("b.ISA", "Isaiah"),
+                             ("b.JER", "Jeremiah"),
+                             ("b.LAM", "Lamentations"),
+                             ("b.EZE", "Ezekiel"),
+                             ("b.DAN", "Daniel"),
+                             ("b.HOS", "Hosea"),
+                             ("b.JOE", "Joel"),
+                             ("b.AMO", "Amos"),
+                             ("b.OBA", "Obadiah"),
+                             ("b.JON", "Jonah"),
+                             ("b.MIC", "Micah"),
+                             ("b.NAH", "Nahum"),
+                             ("b.HAB", "Habakkuk"),
+                             ("b.ZEP", "Zephaniah"),
+                             ("b.HAG", "Haggai"),
+                             ("b.ZEC", "Zechariah"),
+                             ("b.MAL", "Malachi")
+                            ])
 
-new_testament = OrderedDict({
-                            "b.MAT" : "Matthew",
-                            "b.MAR" : "Mark",
-                            "b.LUK" : "Luke",
-                            "b.JOH" : "John",
-                            "b.ACT" : "Acts (of the Apostles)",
-                            "b.ROM" : "Romans",
-                            "b.1CO" : "1 Corinthians",
-                            "b.2CO" : "2 Corinthians",
-                            "b.GAL" : "Galatians",
-                            "b.EPH" : "Ephesians",
-                            "b.PHI" : "Philippians",
-                            "b.COL" : "Colossians",
-                            "b.1TH" : "1 Thessalonians",
-                            "b.2TH" : "2 Thessalonians",
-                            "b.1TI" : "1 Timothy",
-                            "b.2TI" : "2 Timothy",
-                            "b.TIT" : "Titus",
-                            "b.PHM" : "Philemon",
-                            "b.HEB" : "Hebrews",
-                            "b.JAM" : "James",
-                            "b.1PE" : "1 Peter",
-                            "b.2PE" : "2 Peter",
-                            "b.1JO" : "1 John",
-                            "b.2JO" : "2 John",
-                            "b.3JO" : "3 John",
-                            "b.JUD" : "Jude",
-                            "b.REV" : "Revelation"
-                            })
+new_testament = OrderedDict([
+                             ("b.MAT", "Matthew"),
+                             ("b.MAR", "Mark"),
+                             ("b.LUK", "Luke"),
+                             ("b.JOH", "John"),
+                             ("b.ACT", "Acts (of the Apostles)"),
+                             ("b.ROM", "Romans"),
+                             ("b.1CO", "1 Corinthians"),
+                             ("b.2CO", "2 Corinthians"),
+                             ("b.GAL", "Galatians"),
+                             ("b.EPH", "Ephesians"),
+                             ("b.PHI", "Philippians"),
+                             ("b.COL", "Colossians"),
+                             ("b.1TH", "1 Thessalonians"),
+                             ("b.2TH", "2 Thessalonians"),
+                             ("b.1TI", "1 Timothy"),
+                             ("b.2TI", "2 Timothy"),
+                             ("b.TIT", "Titus"),
+                             ("b.PHM", "Philemon"),
+                             ("b.HEB", "Hebrews"),
+                             ("b.JAM", "James"),
+                             ("b.1PE", "1 Peter"),
+                             ("b.2PE", "2 Peter"),
+                             ("b.1JO", "1 John"),
+                             ("b.2JO", "2 John"),
+                             ("b.3JO", "3 John"),
+                             ("b.JUD", "Jude"),
+                             ("b.REV", "Revelation")
+                            ])
 
 all_books = old_testament.copy()
 all_books.update(new_testament)
@@ -108,8 +110,22 @@ class Verse(object):
     def __str__(self, *args, **kwargs):
         return self.text
     
+    def tokenize(self):
+        temp_text = re.sub(r'[^\w\s]','',self.text).lower()
+        return temp_text.split(" ")
+    
+    def unique_tokens(self):
+        return set(self.tokenize())
+    
     def unique_chars(self):
         return set(list(self.text))
+    
+    def token_frequency(self):
+        res = {}
+        tokens = self.tokenize()
+        for token in tokens:
+            res[token] = res.get(token, 0) + 1
+        return res
     
     def char_frequency(self):
         res = {}
@@ -117,7 +133,10 @@ class Verse(object):
         for char in chars:
             res[char] = res.get(char, 0) + 1
         return res
-            
+    
+    def token_count(self):
+        return len(self.tokenize())
+    
 
 class Chapter(object):
     
@@ -140,11 +159,25 @@ class Chapter(object):
                                                 self._id,
                                                 len(self.verses)
                                                 )
-        
+    
+    def unique_tokens(self):
+        res = set({})
+        for verse in self.verses:
+            res = res.union(verse.unique_tokens())
+        return res
+    
     def unique_chars(self):
         res = set({})
         for verse in self.verses:
             res = res.union(verse.unique_chars())
+        return res
+    
+    def token_frequency(self):
+        res = {}
+        for verse in self.verses:
+            partial_freq = verse.token_frequency()
+            for key in partial_freq.keys():
+                res[key] = res.get(key, 0) + partial_freq[key]
         return res
     
     def char_frequency(self):
@@ -155,6 +188,11 @@ class Chapter(object):
                 res[key] = res.get(key, 0) + partial_freq[key]
         return res
 
+    def token_count(self):
+        res = 0
+        for verse in self.verses:
+            res += verse.token_count()
+        return res
 
 class Book(object):
     
@@ -174,11 +212,25 @@ class Book(object):
         return "Book {0} ({1}) with {2} chapters".format(all_books[self._id],
                                                    self._id,
                                                    len(self.chapters))
-        
+
+    def unique_tokens(self):
+        res = set({})
+        for chapter in self.chapters:
+            res = res.union(chapter.unique_tokens())
+        return res
+
     def unique_chars(self):
         res = set({})
         for chapter in self.chapters:
             res = res.union(chapter.unique_chars())
+        return res
+    
+    def token_frequency(self):
+        res = {}
+        for chapter in self.chapters:
+            partial_freq = chapter.token_frequency()
+            for key in partial_freq.keys():
+                res[key] = res.get(key, 0) + partial_freq[key]
         return res
     
     def char_frequency(self):
@@ -187,6 +239,12 @@ class Book(object):
             partial_freq = chapter.char_frequency()
             for key in partial_freq.keys():
                 res[key] = res.get(key, 0) + partial_freq[key]
+        return res
+    
+    def token_count(self):
+        res = 0
+        for chapter in self.chapters:
+            res += chapter.token_count()
         return res
 
 
@@ -244,6 +302,15 @@ class BookSet(object):
     def add(self, book):
         dict_entry = book._id
         self[dict_entry] = book
+        
+    def books_with_id(self, *args):
+        if len(args) == 0:
+            for book in self._all_books_idx:
+                if book != None:
+                    yield book
+        else:
+            for arg in args:
+                yield self[arg]
 
 
 class Bible(object):
@@ -294,21 +361,53 @@ class Bible(object):
     def get_old_testament(self):
         return self.books._old_testament_idx
     
+    def get_old_testament_ids(self):
+        return list(key for key, value in self.books._old_testament.items())
+    
     def get_new_testament(self):
         return self.books._new_testament_idx
     
-    def unique_chars(self):
+    def get_new_testament_ids(self):
+        return list(key for key, value in self.books._new_testament.items())
+    
+    def unique_tokens(self, *book_ids):
         res = set({})
-        for book in self.books:
+        for book in self.books.books_ith_id(*book_ids):
+            res = res.union(book.unique_tokens())
+        return res
+    
+    def unique_chars(self, *book_ids):
+        res = set({})
+        for book in self.books.books_with_id(*book_ids):
             res = res.union(book.unique_chars())
         return res
     
-    def char_frequency(self):
+    def token_frequency(self, *book_ids):
         res = {}
-        for book in self.books:
+        for book in self.books.books_with_id(*book_ids):
+            partial_freq = book.token_frequency()
+            for key in partial_freq.keys():
+                res[key] = res.get(key, 0) + partial_freq[key]
+        return OrderedDict(sorted(res.items(), 
+                                  key=operator.itemgetter(1),
+                                  reverse=True)
+                           )
+    
+    def char_frequency(self, *book_ids):
+        res = {}
+        for book in self.books.books_with_id(*book_ids):
             partial_freq = book.char_frequency()
             for key in partial_freq.keys():
                 res[key] = res.get(key, 0) + partial_freq[key]
+        return OrderedDict(sorted(res.items(), 
+                                  key=operator.itemgetter(1), 
+                                  reverse=True)
+                           )
+    
+    def token_count(self, *book_ids):
+        res = 0
+        for book in self.books.books_with_id(*book_ids):
+            res += book.token_count()
         return res
 
     def __repr__(self, *args, **kwargs):
