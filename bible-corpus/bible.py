@@ -9,6 +9,8 @@ from collections import OrderedDict
 import operator
 import re
 
+from bible_statistics import IndBibleStatistics
+
 
 class Verse(object):
     
@@ -291,7 +293,7 @@ class BookSet(object):
                                                                         )
 
 
-class Bible(object):
+class Bible(IndBibleStatistics):
     
     old_testament = OrderedDict([
                              ("b.GEN", "Genesis"),
@@ -380,6 +382,7 @@ class Bible(object):
             raise TypeError("Not a valid BookSet")
         
         self.books = book_set
+        super(Bible, self).__init__()
         
     def bible_subset(self, *book_ids):
         books = BookSet()
