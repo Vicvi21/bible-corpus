@@ -16,8 +16,14 @@ class IndBibleStatistics(object):
     def __init__(self):
 
         self.char_frequency = self.char_frequency()
-        self.token_frequency = self.token_frequency()
+        
+        self.tok_frequency = self.token_frequency()
+        self.tok_freq_by_length = self.calculate_token_frequencies_by_length()
+        self.tokens_by_frequency = self.get_tokens_by_frequency()
         self.freqs_by_token_length = self.calculate_freq_by_tok_len()
+        
+        self.variance_by_tok_length = self.calculate_variance_by_token_length()
+        self.variance_by_tok_freq = self.calculate_variance_by_token_freq()
         
         self.total_tokens = self.token_count()
         
@@ -28,8 +34,8 @@ class IndBibleStatistics(object):
         self.var_char = statistics.variance(self.char_frequency.values())
         self.std_char = math.sqrt(self.var_char)
         
-        self.mean_tok = statistics.mean(self.token_frequency.values())
-        self.var_tok = statistics.variance(self.token_frequency.values())
+        self.mean_tok = statistics.mean(self.tok_frequency.values())
+        self.var_tok = statistics.variance(self.tok_frequency.values())
         self.std_tok = math.sqrt(self.var_tok)
         
         self.mean_fbtl = statistics.mean(self.freqs_by_token_length.values())
@@ -42,7 +48,7 @@ class IndBibleStatistics(object):
                                                      self.mean_char, 
                                                      self.std_char)
         
-        self.z_scores_tok = self.calculate_z_scores(self.token_frequency, 
+        self.z_scores_tok = self.calculate_z_scores(self.tok_frequency, 
                                                     self.mean_tok, 
                                                     self.std_tok)
         
@@ -54,7 +60,7 @@ class IndBibleStatistics(object):
 
     def calculate_freq_by_tok_len(self):
         res = {}
-        for token, freq in self.token_frequency.items():
+        for token, freq in self.tok_frequency.items():
             res[len(token)] = res.get(len(token), 0) + freq
         return OrderedDict(sorted(res.items(), 
                                   key=operator.itemgetter(1), 
@@ -75,11 +81,51 @@ class IndBibleStatistics(object):
             cumulative += probability
         return cumulative
     
+    def calculate_token_frequencies_by_length(self):
+        res = {}
+        for token, frequency in self.tok_frequency.items():
+            temp = res.get(len(token), {})
+            temp[token] = frequency
+            res[len(token)] = temp
+        return res
+    
+    def get_tokens_by_frequency(self):
+        res = {}
+        for token, frequency in self.tok_frequency.items():
+            temp = res.get(frequency, [])
+            temp.append(token)
+            res[frequency] = temp
+        return res
+    
+    def calculate_variance_by_token_length(self):
+        res = {}
+        max_value = max(self.tok_freq_by_length)
+        for i in range(max_value + 1):
+            try:
+                freqs = [value for _, value in \
+                                            self.tok_freq_by_length[i].items()]
+                res[i] = statistics.variance(freqs)
+            except:
+                res[i] = None
+        return res
+    
+    def calculate_variance_by_token_freq(self):
+        res = {}
+        for freq, tokens in self.tokens_by_frequency.items():
+            try:
+                lengths = [len(value) for value in tokens]
+                res[freq] = statistics.variance(lengths)
+            except:
+                res[freq] = None
+        return res
+            
     def as_dict(self):
         res = {}
         res["QtyOfTokens"] = self.total_tokens
         for key, value in self.freqs_by_token_length.items():
             res["StrLen_" + str(key)] = value
+        for length, variance in self.variance_by_tok_length.items():
+            res["VarFreq_StrLen_" + str(length)] = variance
         return res
     
     def plot(self):
@@ -110,7 +156,10 @@ class BibleGroup(object):
                 length_set.add(key)
         length_headers = ["StrLen_" + str(length) for length in \
                                                      sorted(length_set)]
-        return basic_headers + length_headers
+        
+        var_headers = ["VarFreq_StrLen_" + str(length) for length in \
+                                                     sorted(length_set)]
+        return basic_headers + length_headers + var_headers
     
     def plot_cumulative_dist(self):
         
