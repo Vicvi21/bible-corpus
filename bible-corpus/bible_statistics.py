@@ -3,6 +3,7 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
+import scipy.stats
 
 import operator
 import statistics
@@ -124,16 +125,20 @@ class IndBibleStatistics(object):
         res["QtyOfTokens"] = self.total_tokens
         
         # Token Length frequencies
-        for key, value in self.freqs_by_token_length.items():
-            res["Freq_StrLen_" + str(key)] = value
+        for length, qty_of_tkns in self.freqs_by_token_length.items():
+            res["QtyTokens_StrLen_" + str(length)] = qty_of_tkns
+            
+         # No. of Tokens by frequencies
+        for freq, lst_tok in self.tokens_by_frequency.items():
+            res["QtyTokens_Freq_" + str(freq)] = len(lst_tok)
         
         # Token frequencies variance by length
-        for length, variance in self.variance_by_tok_length.items():
-            res["VarFreq_StrLen_" + str(length)] = variance
+        for length, freq_variance in self.variance_by_tok_length.items():
+            res["VarFreq_StrLen_" + str(length)] = freq_variance
         
         # Token length variance by frequency
-        for freq, variance in self.variance_by_tok_freq.items():
-            res["VarStrLen_Freq_" + str(freq)] = variance
+        for freq, len_variance in self.variance_by_tok_freq.items():
+            res["VarStrLen_Freq_" + str(freq)] = len_variance
             
         return res
     
@@ -155,31 +160,52 @@ class BibleGroup(object):
     
     def __init__(self):
         self.bibles = []
+        
+        self.basic_headers = ["QtyOfTokens"]
+        self.length_set = set()
+        self.freq_set = set()
+        
+    
+    def calculate_freq_length_sets(self):
+        for bible in self.bibles:
+            for length in bible.freqs_by_token_length.keys():
+                self.length_set.add(length)
+            for freq in bible.tokens_by_frequency.keys():
+                self.freq_set.add(freq)
+        return self.length_set, self.freq_set
+    
+    @property
+    def length_headers(self):
+        length_headers = ["QtyTokens_StrLen_" + str(length) for length in \
+                                                     sorted(self.length_set)]
+        return length_headers
+    
+    @property
+    def freq_headers(self):
+        freq_headers = ["QtyTokens_Freq_" + str(freq) for freq in \
+                                                     sorted(self.freq_set)]
+        return freq_headers
+    
+    @property
+    def varfreq_headers(self):
+        varfreq_headers = ["VarFreq_StrLen_" + str(length) for length in \
+                                                     sorted(self.length_set)]
+        return varfreq_headers
+    
+    @property
+    def varstrlen_headers(self):
+        varstrlen_headers = ["VarStrLen_Freq_" + str(freq) for freq in \
+                                                     sorted(self.freq_set)]
+        return varstrlen_headers
     
     @property
     def column_headers(self):
-        basic_headers = ["QtyOfTokens"]
-        length_set = set()
-        freq_set = set()
-        
-        for bible in self.bibles:
-            for length in bible.freqs_by_token_length.keys():
-                length_set.add(length)
-            for freq in bible.tokens_by_frequency.keys():
-                freq_set.add(freq)
-        
-        length_headers = ["Freq_StrLen_" + str(length) for length in \
-                                                     sorted(length_set)]
-        
-        varfreq_headers = ["VarFreq_StrLen_" + str(length) for length in \
-                                                     sorted(length_set)]
-        
-        varstlen_headers = ["VarStrLen_Freq_" + str(freq) for freq in \
-                                                     sorted(freq_set)]
-        return basic_headers + \
-               length_headers + \
-               varfreq_headers + \
-               varstlen_headers
+        self.calculate_freq_length_sets()
+        return self.basic_headers + \
+               self.length_headers + \
+               self.freq_headers + \
+               self.varfreq_headers + \
+               self.varstrlen_headers
     
     def plot_cumulative_dist(self):
         
@@ -198,7 +224,72 @@ class BibleGroup(object):
             raise TypeError("Not correct IndBibleStatistics type")
         self.bibles.append(bible)
         
-    def to_dataframe(self, *set_of_bibles):
+    def spearman_dataframe(self):
+        df = self.to_dataframe()
+        
+        res = pd.DataFrame(columns=["VarFreq_times_StrLen", 
+                                    "Rho_VarFreq_times_StrLen", 
+                                    "Pi_VarFreq_times_StrLen",
+                                    "VarStrLen_times_Freq", 
+                                    "Rho_VarStrLen_times_Freq", 
+                                    "Pi_VarStrLen_times_Freq",
+                                    ])
+        
+        # tokens by length_vector
+        freq_by_len = self.length_headers
+        freq_by_len_df = df[freq_by_len]
+        
+        # variance of freq by len
+        var_freq_by_len = self.varfreq_headers
+        var_freq_by_len_df = df[var_freq_by_len]
+        
+        # tokens by freq vector
+        len_by_freq = self.freq_headers
+        len_by_freq_df = df[len_by_freq]
+        
+        # variance of len by freq
+        var_len_by_freq = self.varstrlen_headers
+        var_len_by_freq_df = df[var_len_by_freq]
+
+        for i in range(len(freq_by_len_df)):
+            row_res = {}
+ 
+            language = freq_by_len_df.iloc[i].name
+            
+            vect1 = freq_by_len_df.iloc[i].as_matrix()
+            vect2 = var_freq_by_len_df.iloc[i].as_matrix()
+            
+            rho, pi = self.spearmanr(vect1, vect2)
+            row_res["VarFreq_times_StrLen"] = np.sum(
+                                                np.nan_to_num(vect1 * vect2)
+                                                )
+            row_res["Rho_VarFreq_times_StrLen"] = rho
+            row_res["Pi_VarFreq_times_StrLen"] = pi
+            
+            vect1 = len_by_freq_df.iloc[i].as_matrix()
+            vect2 = var_len_by_freq_df.iloc[i].as_matrix()
+            
+            rho, pi = self.spearmanr(vect1, vect2)
+            row_res["VarStrLen_times_Freq"] = np.sum(
+                                                np.nan_to_num(vect1 * vect2)
+                                                )
+            row_res["Rho_VarStrLen_times_Freq"] = rho
+                    
+            row_res["Pi_VarStrLen_times_Freq"] = pi
+            
+            res.loc[language] = pd.Series(row_res) 
+        
+        return res
+
+    def spearmanr(self, array1, array2):
+        x1 = np.ma.masked_invalid(array1)
+        y1 = np.ma.masked_invalid(array2)
+        m = np.ma.mask_or(np.ma.getmask(x1), np.ma.getmask(y1))
+        k = np.ma.array(x1, mask=m, copy=True).compressed()
+        j = np.ma.array(y1, mask=m, copy=True).compressed()
+        return scipy.stats.spearmanr(k, j, nan_policy='omit')
+        
+    def to_dataframe(self):
         dataframe = pd.DataFrame(columns=self.column_headers)
         for bible in self.bibles:
             dataframe.loc[bible.language] = pd.Series(bible.as_dict())
