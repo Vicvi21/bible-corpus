@@ -122,10 +122,19 @@ class IndBibleStatistics(object):
     def as_dict(self):
         res = {}
         res["QtyOfTokens"] = self.total_tokens
+        
+        # Token Length frequencies
         for key, value in self.freqs_by_token_length.items():
-            res["StrLen_" + str(key)] = value
+            res["Freq_StrLen_" + str(key)] = value
+        
+        # Token frequencies variance by length
         for length, variance in self.variance_by_tok_length.items():
             res["VarFreq_StrLen_" + str(length)] = variance
+        
+        # Token length variance by frequency
+        for freq, variance in self.variance_by_tok_freq.items():
+            res["VarStrLen_Freq_" + str(freq)] = variance
+            
         return res
     
     def plot(self):
@@ -151,15 +160,26 @@ class BibleGroup(object):
     def column_headers(self):
         basic_headers = ["QtyOfTokens"]
         length_set = set()
+        freq_set = set()
+        
         for bible in self.bibles:
-            for key in bible.freqs_by_token_length.keys():
-                length_set.add(key)
-        length_headers = ["StrLen_" + str(length) for length in \
+            for length in bible.freqs_by_token_length.keys():
+                length_set.add(length)
+            for freq in bible.tokens_by_frequency.keys():
+                freq_set.add(freq)
+        
+        length_headers = ["Freq_StrLen_" + str(length) for length in \
                                                      sorted(length_set)]
         
-        var_headers = ["VarFreq_StrLen_" + str(length) for length in \
+        varfreq_headers = ["VarFreq_StrLen_" + str(length) for length in \
                                                      sorted(length_set)]
-        return basic_headers + length_headers + var_headers
+        
+        varstlen_headers = ["VarStrLen_Freq_" + str(freq) for freq in \
+                                                     sorted(freq_set)]
+        return basic_headers + \
+               length_headers + \
+               varfreq_headers + \
+               varstlen_headers
     
     def plot_cumulative_dist(self):
         

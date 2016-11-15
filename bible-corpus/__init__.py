@@ -27,6 +27,7 @@ for _, _, filenames in os.walk(source_dir):
         #    break
 
 dataframe = bibles.to_dataframe()
+dataframe=dataframe.dropna(axis=1,how='all')
 dataframe.to_csv("../bible_word_frequence_data.csv")
 summary = dataframe.describe()
 summary.to_csv("../summary_bible_word_frequence_data.csv")
