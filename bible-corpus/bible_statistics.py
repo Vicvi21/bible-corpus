@@ -142,6 +142,60 @@ class IndBibleStatistics(object):
             
         return res
     
+    def plot_freq_long(self, annotated=False, save=True, folder="../plots/"):
+        dataset = [(token, frequency, len(token)) for token, frequency in \
+                                                    self.tok_frequency.items()]
+        label_set = {}
+        for label, x, y in dataset:
+            x_coord = label_set.get(x, {})
+            xy_coord = x_coord.get(y, set([]))
+            xy_coord.add(label)
+            
+            x_coord[y] = xy_coord
+            label_set[x] = x_coord
+            
+        if save:
+            #plt.figure(figsize=(33.1, 46.8))
+            #plt.plot()
+            #plt.figure(figsize=(46.8, 33.1), dpi=300)
+            plt.figure(figsize=(11.69, 8.27))
+        
+        plt.yticks(range(max(self.tok_freq_by_length) + 1))
+        #res = np.logspace(np.log10(0.01), np.log10(max(self.tokens_by_frequency)))
+        res = [n for n in range(0, 
+                                max(self.tokens_by_frequency), 
+                                int(max(self.tokens_by_frequency)/15)
+                                )
+               ]
+        if not max(self.tokens_by_frequency) in res:
+            res.append(max(self.tokens_by_frequency))
+        plt.xticks(res)
+        
+        # X frequency Y length 
+        ndataset = np.array(dataset)
+        plt.scatter(np.array(ndataset[:, 1], dtype=np.int32), 
+                    np.array(ndataset[:, 2], dtype=np.int32),
+                    marker = 'o',)
+        
+        if annotated:
+            for label, x, y in dataset:
+                try:
+                    plt.annotate(str(label_set[x][y]),
+                                 xy=(x, y))
+                    del label_set[x][y]
+                except:
+                    pass
+                
+        plt.ylabel("Token Length")
+        plt.xlabel("Token Frequency")
+        plt.title(self.language)
+        plt.xlim(xmin=0)
+        plt.ylim(ymin=0)
+        if save:
+            plt.savefig(folder + self.language)
+        else:
+            plt.show()
+    
     def plot(self):
         d = OrderedDict(sorted(self.freqs_by_token_length.items(), 
                                key=operator.itemgetter(0)))
