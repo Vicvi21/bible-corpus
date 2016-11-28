@@ -24,6 +24,9 @@ for _, _, filenames in os.walk(source_dir):
               )
         i += 1
         new_bible.plot_freq_long()
+        new_bible.plot_freq_varlong()
+        new_bible.plot_long_freq()
+        new_bible.plot_long_varfreq()
         #if i == 1:
         #    break
 
