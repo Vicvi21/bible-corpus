@@ -3,7 +3,8 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
-import scipy.stats
+import scipy.stats as ss
+import Bio.Cluster as bc
 import gc
 
 import operator
@@ -391,67 +392,52 @@ class BibleGroup(object):
     def spearman_dataframe(self):
         df = self.to_dataframe()
         
-        res = pd.DataFrame(columns=["VarFreq_times_StrLen", 
-                                    "Rho_VarFreq_times_StrLen", 
-                                    "Pi_VarFreq_times_StrLen",
-                                    "VarStrLen_times_Freq", 
-                                    "Rho_VarStrLen_times_Freq", 
-                                    "Pi_VarStrLen_times_Freq",
+        res = pd.DataFrame(columns=["Rho_StrLen_VarFreq", 
+                                    "P_StrLen_VarFreq",
+                                    "Rho_Freq_VarStrLen", 
+                                    "P_Freq_VarStrLen",
                                     ])
         
-        # tokens by length_vector
-        freq_by_len = self.length_headers
-        freq_by_len_df = df[freq_by_len]
-        
-        # variance of freq by len
-        var_freq_by_len = self.varfreq_headers
-        var_freq_by_len_df = df[var_freq_by_len]
-        
-        # tokens by freq vector
-        len_by_freq = self.freq_headers
-        len_by_freq_df = df[len_by_freq]
-        
-        # variance of len by freq
-        var_len_by_freq = self.varstrlen_headers
-        var_len_by_freq_df = df[var_len_by_freq]
-
-        for i in range(len(freq_by_len_df)):
+        for bible in self.bibles:
             row_res = {}
- 
-            language = freq_by_len_df.iloc[i].name
+            dataset = [(frequency, l_variance) for frequency, l_variance in \
+                                            bible.variance_by_tok_freq.items()
+                                            if l_variance != None]
+        
+            # X frequency Y length_variance 
+            freq_lvar_dset = np.array(sorted(dataset))
+            sper_freq_lvar_dset = self.spearmanr(freq_lvar_dset[:, 0], 
+                                                 freq_lvar_dset[:, 1], 
+                                                 True)
             
-            vect1 = freq_by_len_df.iloc[i].as_matrix()
-            vect2 = var_freq_by_len_df.iloc[i].as_matrix()
+            row_res["Rho_StrLen_VarFreq"] = sper_freq_lvar_dset[0]
+            row_res["P_StrLen_VarFreq"] = sper_freq_lvar_dset[1]
             
-            rho, pi = self.spearmanr(vect1, vect2)
-            row_res["VarFreq_times_StrLen"] = np.sum(
-                                                np.nan_to_num(vect1 * vect2)
-                                                )
-            row_res["Rho_VarFreq_times_StrLen"] = rho
-            row_res["Pi_VarFreq_times_StrLen"] = pi
+            dataset = [(token_length, f_variance) for token_length, f_variance in \
+                                        bible.variance_by_tok_length.items()\
+                                        if f_variance != None]
             
-            vect1 = len_by_freq_df.iloc[i].as_matrix()
-            vect2 = var_len_by_freq_df.iloc[i].as_matrix()
+            len_fvar_dset = np.array(sorted(dataset))
+            sper_len_fvar_dset = self.spearmanr(len_fvar_dset[:, 0], 
+                                                len_fvar_dset[:, 1], 
+                                                True)
             
-            rho, pi = self.spearmanr(vect1, vect2)
-            row_res["VarStrLen_times_Freq"] = np.sum(
-                                                np.nan_to_num(vect1 * vect2)
-                                                )
-            row_res["Rho_VarStrLen_times_Freq"] = rho
-                    
-            row_res["Pi_VarStrLen_times_Freq"] = pi
-            
-            res.loc[language] = pd.Series(row_res) 
+            row_res["Rho_Freq_VarStrLen"] = sper_len_fvar_dset[0]
+            row_res["P_Freq_VarStrLen"] = sper_len_fvar_dset[1]
+            res.loc[bible.language] = pd.Series(row_res)
         
         return res
 
-    def spearmanr(self, array1, array2):
+    def spearmanr(self, array1, array2, with_scipy=True):
         x1 = np.ma.masked_invalid(array1)
         y1 = np.ma.masked_invalid(array2)
         m = np.ma.mask_or(np.ma.getmask(x1), np.ma.getmask(y1))
         k = np.ma.array(x1, mask=m, copy=True).compressed()
         j = np.ma.array(y1, mask=m, copy=True).compressed()
-        return scipy.stats.spearmanr(k, j, nan_policy='omit')
+        if with_scipy:
+            return ss.spearmanr(k, j, nan_policy='omit')
+        else:
+            return bc.distancematrix((k, j), dist="s")
         
     def to_dataframe(self):
         dataframe = pd.DataFrame(columns=self.column_headers)

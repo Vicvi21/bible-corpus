@@ -1,3 +1,4 @@
+biopython==1.68
 cycler==0.10.0
 decorator==4.0.10
 ipdb==0.10.1
