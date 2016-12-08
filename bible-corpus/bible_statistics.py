@@ -198,6 +198,37 @@ class IndBibleStatistics(object):
             plt.show()
         plt.close()
         gc.collect()
+    
+    def plot_freq_meanlong(self, annotated=False, save=True, 
+                           folder="../plots/freq_meanlong/"):
+        dataset = []
+        for freq, tokens in self.tokens_by_frequency.items():
+            len_values = []
+            for token in tokens:
+                len_values.append(len(token))
+            mean_val = statistics.mean(len_values)
+            dataset.append((freq, mean_val))
+            
+        if save:
+            fig = plt.figure(figsize=(11.69, 8.27))
+        
+        # X frequency Y mean length 
+        ndataset = np.array(sorted(dataset))
+        plt.bar(np.array(ndataset[:, 0], dtype=np.int32), 
+                np.array(ndataset[:, 1], dtype=np.int32))
+        
+        plt.ylabel("Mean of Token Lengths")
+        plt.xlabel("Token Frequency")
+        plt.title(self.language)
+        plt.xlim(xmin=0)
+        plt.ylim(ymin=0)
+        if save:
+            plt.savefig(folder + self.language)
+            fig.clf()
+        else:
+            plt.show()
+        plt.close()
+        gc.collect()
             
     def plot_freq_varlong(self, save=True, folder="../plots/freq_varlong/"):
         dataset = [(frequency, l_variance) for frequency, l_variance in \
@@ -389,7 +420,7 @@ class BibleGroup(object):
             raise TypeError("Not correct IndBibleStatistics type")
         self.bibles.append(bible)
         
-    def spearman_dataframe(self):
+    def spearman_var_dataframe(self):
         df = self.to_dataframe()
         
         res = pd.DataFrame(columns=["Rho_StrLen_VarFreq", 
@@ -424,6 +455,53 @@ class BibleGroup(object):
             
             row_res["Rho_Freq_VarStrLen"] = sper_len_fvar_dset[0]
             row_res["P_Freq_VarStrLen"] = sper_len_fvar_dset[1]
+            res.loc[bible.language] = pd.Series(row_res)
+        
+        return res
+    
+    def spearman_novar_dataframe(self):
+        df = self.to_dataframe()
+        
+        res = pd.DataFrame(columns=["Rho_Freq_StrLen", 
+                                    "P_Freq_StrLen",
+                                    "Rho_Freq_MeanStrLen", 
+                                    "P_Freq_MeanStrLen"
+                                    ])
+        
+        for bible in self.bibles:
+
+            row_res = {}
+            dataset = []
+            for freq, tokens in bible.tokens_by_frequency.items():
+                for token in tokens:
+                    dataset.append((freq, len(token)))
+        
+            # X frequencies Y lengths
+            freq_len_dset = np.array(sorted(dataset))
+            sper_freq_len_dset = self.spearmanr(freq_len_dset[:, 0], 
+                                                freq_len_dset[:, 1], 
+                                                True)
+            
+            row_res["Rho_Freq_StrLen"] = sper_freq_len_dset[0]
+            row_res["P_Freq_StrLen"] = sper_freq_len_dset[1]
+            
+            dataset = []
+            for freq, tokens in bible.tokens_by_frequency.items():
+                len_values = []
+                for token in tokens:
+                    len_values.append(len(token))
+                mean_val = statistics.mean(len_values)
+                dataset.append((freq, mean_val))
+            
+            # X frequencies Y Mean Lengths
+            freq_mlen_dset = np.array(sorted(dataset))
+            sper_freq_mlen_dset = self.spearmanr(freq_mlen_dset[:, 0], 
+                                                freq_mlen_dset[:, 1], 
+                                                True)
+            
+            row_res["Rho_Freq_MeanStrLen"] = sper_freq_mlen_dset[0]
+            row_res["P_Freq_MeanStrLen"] = sper_freq_mlen_dset[1]
+            
             res.loc[bible.language] = pd.Series(row_res)
         
         return res

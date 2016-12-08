@@ -27,6 +27,7 @@ for _, _, filenames in os.walk(source_dir):
 #         new_bible.plot_freq_varlong()
 #         new_bible.plot_long_freq()
 #         new_bible.plot_long_varfreq()
+        new_bible.plot_freq_meanlong()
 #         if i == 1:
 #             break
 
@@ -42,7 +43,11 @@ corrs = corrs.dropna(axis=0, how="all")
 corrs = corrs.dropna(axis=1, how="all")
 #corrs.to_csv("../correlation_matrix.csv")
 
-spearman = bibles.spearman_dataframe()
-spearman.to_csv("../spearman_cors.csv")
+spearman_var = bibles.spearman_var_dataframe()
+#spearman_var.to_csv("../spearman_var_cors.csv")
+
+spearman_novar = bibles.spearman_novar_dataframe()
+spearman_novar.to_csv("../spearman_novar_cors.csv")
+
 #bibles.plot_cumulative_dist()
 import ipdb;ipdb.set_trace()
