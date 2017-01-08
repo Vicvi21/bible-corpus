@@ -446,8 +446,8 @@ class BibleGroup(object):
                                     "P_Freq_VarStrLen",
                                     "Rho_Freq_MeanStrLen",
                                     "P_Freq_MeanStrLen",
-                                    "Steiger_z_Freq_VarStrLen_MeanStrLen",
-                                    "Steiger_p_Freq_VarStrLen_MeanStrLen"
+                                    "Fisher_z_Freq_VarStrLen_MeanStrLen",
+                                    "Fisher_p_Freq_VarStrLen_MeanStrLen"
                                     ])
         
         for bible in self.bibles:
@@ -519,8 +519,8 @@ class BibleGroup(object):
                                    n2=len_dataset13
                                    )
             
-            row_res["Steiger_z_Freq_VarStrLen_MeanStrLen"] = steiger[2][0]
-            row_res["Steiger_p_Freq_VarStrLen_MeanStrLen"] = steiger[3][0]
+            row_res["Fisher_z_Freq_VarStrLen_MeanStrLen"] = steiger[2][0]
+            row_res["Fisher_p_Freq_VarStrLen_MeanStrLen"] = steiger[3][0]
             
             res.loc[bible.language] = pd.Series(row_res)
         
