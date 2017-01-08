@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import scipy.stats as ss
 import Bio.Cluster as bc
+from rpy2.robjects.packages import importr
 import gc
 
 import operator
@@ -12,6 +13,8 @@ import statistics
 import math
 
 from collections import OrderedDict
+
+psych = importr("psych")
 
 
 class IndBibleStatistics(object):
@@ -419,6 +422,109 @@ class BibleGroup(object):
         if not isinstance(bible, IndBibleStatistics):
             raise TypeError("Not correct IndBibleStatistics type")
         self.bibles.append(bible)
+    
+    def spearman_dataframe(self):
+        # Efectivament |Rho_Freq_StrLen| < |Rho_Freq_MeanStrLen| < |Rho_Freq_VarStrLen|, 
+        # tal com esperava. Sembla que tenim una nova llei que és més forta que la
+        # llei de brevetat original. Per poder comparar correlacions de forma 
+        # estadísticament rigorosa caldria usar un test de 
+        # Hotteling / Steiger’s (o semblant per a correlació de Spearman), 
+        # perquè en la comparativa que tenim més amunt, 
+        # Rho_Freq_MeanStrLen i Rho_Freq_VarStrLen compateixen la mateixa 
+        # de columna de freqüències de la matriu. Aquests testos tenen l'objectiu 
+        # de determinar si la diferència entre dues correlacions és realment 
+        # significativa. Poso la mà al foc a què ho és perquè de forma sistemàtica 
+        # en diferents llengües tenim |Rho_Freq_MeanStrLen| < |Rho_Freq_VarStrLen|
+        
+        df = self.to_dataframe()
+        
+        res = pd.DataFrame(columns=["Rho_StrLen_VarFreq", 
+                                    "P_StrLen_VarFreq",
+                                    "Rho_Freq_StrLen", 
+                                    "P_Freq_StrLen",
+                                    "Rho_Freq_VarStrLen",
+                                    "P_Freq_VarStrLen",
+                                    "Rho_Freq_MeanStrLen",
+                                    "P_Freq_MeanStrLen",
+                                    "Steiger_z_Freq_VarStrLen_MeanStrLen",
+                                    "Steiger_p_Freq_VarStrLen_MeanStrLen"
+                                    ])
+        
+        for bible in self.bibles:
+            row_res = {}
+            
+            # X length Y frequency variance 
+            dataset = [(token_length, f_variance) for token_length, f_variance in \
+                                        bible.variance_by_tok_length.items()\
+                                        if f_variance != None]
+            
+            len_fvar_dset = np.array(sorted(dataset))
+            sper_len_fvar_dset = self.spearmanr(len_fvar_dset[:, 0], 
+                                                len_fvar_dset[:, 1], 
+                                                True)
+            
+            row_res["Rho_StrLen_VarFreq"] = sper_len_fvar_dset[0]
+            row_res["P_StrLen_VarFreq"] = sper_len_fvar_dset[1]
+            
+            # X frequencies Y lengths 
+            dataset = []
+            for freq, tokens in bible.tokens_by_frequency.items():
+                for token in tokens:
+                    dataset.append((freq, len(token)))
+        
+            freq_len_dset = np.array(sorted(dataset))
+            sper_freq_len_dset = self.spearmanr(freq_len_dset[:, 0], 
+                                                freq_len_dset[:, 1], 
+                                                True)
+            
+            row_res["Rho_Freq_StrLen"] = sper_freq_len_dset[0]
+            row_res["P_Freq_StrLen"] = sper_freq_len_dset[1]
+            
+            # X frequency Y length_variance
+            dataset = [(frequency, l_variance) for frequency, l_variance in \
+                                            bible.variance_by_tok_freq.items()
+                                            if l_variance != None]
+            
+            len_dataset12 = len(dataset)
+            freq_lvar_dset = np.array(sorted(dataset))
+            sper_freq_lvar_dset = self.spearmanr(freq_lvar_dset[:, 0], 
+                                                 freq_lvar_dset[:, 1], 
+                                                 True)
+            
+            row_res["Rho_Freq_VarStrLen"] = sper_freq_lvar_dset[0]
+            row_res["P_Freq_VarStrLen"] = sper_freq_lvar_dset[1]
+            
+            # X frequencies Y Mean Lengths
+            dataset = []
+            for freq, tokens in bible.tokens_by_frequency.items():
+                len_values = []
+                for token in tokens:
+                    len_values.append(len(token))
+                mean_val = statistics.mean(len_values)
+                dataset.append((freq, mean_val))
+            
+            len_dataset13 = len(dataset)
+            freq_mlen_dset = np.array(sorted(dataset))
+            sper_freq_mlen_dset = self.spearmanr(freq_mlen_dset[:, 0], 
+                                                freq_mlen_dset[:, 1], 
+                                                True)
+            
+            row_res["Rho_Freq_MeanStrLen"] = sper_freq_mlen_dset[0]
+            row_res["P_Freq_MeanStrLen"] = sper_freq_mlen_dset[1]
+            
+            # Steiger's Z
+            steiger = psych.r_test(len_dataset12, 
+                                   row_res["Rho_Freq_VarStrLen"], 
+                                   row_res["Rho_Freq_MeanStrLen"], 
+                                   n2=len_dataset13
+                                   )
+            
+            row_res["Steiger_z_Freq_VarStrLen_MeanStrLen"] = steiger[2][0]
+            row_res["Steiger_p_Freq_VarStrLen_MeanStrLen"] = steiger[3][0]
+            
+            res.loc[bible.language] = pd.Series(row_res)
+        
+        return res
         
     def spearman_var_dataframe(self):
         df = self.to_dataframe()
@@ -431,18 +537,6 @@ class BibleGroup(object):
         
         for bible in self.bibles:
             row_res = {}
-            dataset = [(frequency, l_variance) for frequency, l_variance in \
-                                            bible.variance_by_tok_freq.items()
-                                            if l_variance != None]
-        
-            # X frequency Y length_variance 
-            freq_lvar_dset = np.array(sorted(dataset))
-            sper_freq_lvar_dset = self.spearmanr(freq_lvar_dset[:, 0], 
-                                                 freq_lvar_dset[:, 1], 
-                                                 True)
-            
-            row_res["Rho_StrLen_VarFreq"] = sper_freq_lvar_dset[0]
-            row_res["P_StrLen_VarFreq"] = sper_freq_lvar_dset[1]
             
             dataset = [(token_length, f_variance) for token_length, f_variance in \
                                         bible.variance_by_tok_length.items()\
@@ -453,8 +547,22 @@ class BibleGroup(object):
                                                 len_fvar_dset[:, 1], 
                                                 True)
             
-            row_res["Rho_Freq_VarStrLen"] = sper_len_fvar_dset[0]
-            row_res["P_Freq_VarStrLen"] = sper_len_fvar_dset[1]
+            row_res["Rho_StrLen_VarFreq"] = sper_len_fvar_dset[0]
+            row_res["P_StrLen_VarFreq"] = sper_len_fvar_dset[1]
+            
+            dataset = [(frequency, l_variance) for frequency, l_variance in \
+                                            bible.variance_by_tok_freq.items()
+                                            if l_variance != None]
+        
+            # X frequency Y length_variance 
+            freq_lvar_dset = np.array(sorted(dataset))
+            sper_freq_lvar_dset = self.spearmanr(freq_lvar_dset[:, 0], 
+                                                 freq_lvar_dset[:, 1], 
+                                                 True)
+            
+            row_res["Rho_Freq_VarStrLen"] = sper_freq_lvar_dset[0]
+            row_res["P_Freq_VarStrLen"] = sper_freq_lvar_dset[1]
+            
             res.loc[bible.language] = pd.Series(row_res)
         
         return res
