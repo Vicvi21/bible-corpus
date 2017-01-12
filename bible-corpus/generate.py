@@ -54,12 +54,15 @@ class RandomBible(object):
                     if chapter.attrib.get("type", "") == "chapter" :
                         for verse in chapter:
                             if verse.attrib.get("type", "") == "verse" :
-                                verse.text = RandomBible.substitute_verse(
+                                try:
+                                    verse.text = RandomBible.substitute_verse(
                                                                 verse.text, 
                                                                 unique_chars,
                                                                 space_as_char)
+                                except:
+                                    pass
         results_path = results_folder + new_language + ".xml"
-        xml_tree.write(results_path)
+        xml_tree.write(results_path, encoding="unicode")
         return results_path
         
     @classmethod

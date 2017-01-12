@@ -147,7 +147,10 @@ class IndBibleStatistics(object):
             
         return res
     
-    def plot_freq_long(self, annotated=False, save=True, folder="../plots/freq_long/"):
+    def plot_freq_long(self, annotated=False, save=True, 
+                       plot_folder="../plots/", 
+                       sub_folder="freq_long/"):
+        folder = plot_folder + sub_folder
         dataset = [(token, frequency, len(token)) for token, frequency in \
                                                     self.tok_frequency.items()]
         label_set = {}
@@ -202,8 +205,10 @@ class IndBibleStatistics(object):
         plt.close()
         gc.collect()
     
-    def plot_freq_meanlong(self, annotated=False, save=True, 
-                           folder="../plots/freq_meanlong/"):
+    def plot_freq_meanlong(self, annotated=False, save=True,
+                           plot_folder="../plots/", 
+                           sub_folder="freq_meanlong/"):
+        folder = plot_folder + sub_folder
         dataset = []
         for freq, tokens in self.tokens_by_frequency.items():
             len_values = []
@@ -233,7 +238,10 @@ class IndBibleStatistics(object):
         plt.close()
         gc.collect()
             
-    def plot_freq_varlong(self, save=True, folder="../plots/freq_varlong/"):
+    def plot_freq_varlong(self, save=True, 
+                          plot_folder="../plots/", 
+                          sub_folder="freq_varlong/"):
+        folder = plot_folder + sub_folder
         dataset = [(frequency, l_variance) for frequency, l_variance in \
                                             self.variance_by_tok_freq.items()
                                             if l_variance != None]
@@ -259,7 +267,10 @@ class IndBibleStatistics(object):
         plt.close()
         gc.collect()
 
-    def plot_long_freq(self, annotated=False, save=True, folder="../plots/long_freq/"):
+    def plot_long_freq(self, annotated=False, save=True, 
+                       plot_folder="../plots/", 
+                       sub_folder="long_freq/"):
+        folder = plot_folder + sub_folder
         dataset = [(token, frequency, len(token)) for token, frequency in \
                                                     self.tok_frequency.items()]
         label_set = {}
@@ -314,7 +325,11 @@ class IndBibleStatistics(object):
         plt.close()
         gc.collect()
         
-    def plot_long_varfreq(self, save=True, folder="../plots/long_varfreq/"):
+    def plot_long_varfreq(self, save=True, 
+                          plot_folder="../plots/", 
+                          sub_folder="long_varfreq/"):
+        folder = plot_folder + sub_folder
+
         dataset = [(token_length, f_variance) for token_length, f_variance in \
                                         self.variance_by_tok_length.items()\
                                         if f_variance != None]
