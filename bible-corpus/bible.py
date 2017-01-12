@@ -50,7 +50,12 @@ class Verse(object):
         return set(self.tokenize())
     
     def unique_chars(self):
-        return set(list(self.text))
+        #return set(list(self.text))
+        char_set = set()
+        for token in self.tokenize():
+            char_set = char_set.union(list(token))
+        char_set = char_set.difference(list("1234567890"))
+        return char_set
     
     def token_frequency(self):
         res = {}
