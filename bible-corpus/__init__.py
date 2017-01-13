@@ -15,14 +15,15 @@ source_dirs = ["../bibles/Usable/",
 
 parent_dirs = ["Usable/",
                "Random/",
-               "Random_Space_Char/"]
+               "Random_Space_Char/",
+               "Testing/"]
 
 # Configuration
-selected_dir = 0
-generate_random = True
-generate_whitespace_random = True
-make_plots = False
-process = False
+selected_dir = 2
+generate_random = False
+generate_whitespace_random = False
+make_plots = True
+process_stats = True
 
 bibles = BibleGroup()
 
@@ -57,7 +58,7 @@ for _, _, filenames in os.walk(source_dirs[selected_dir]):
                                                                 source_dirs[2],
                                                                 True)
         
-if process:
+if process_stats:
     dataframe = bibles.to_dataframe()
     dataframe = dataframe.dropna(axis=1,how='all')
     

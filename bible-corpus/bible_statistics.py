@@ -170,9 +170,10 @@ class IndBibleStatistics(object):
         
         plt.yticks(range(max(self.tok_freq_by_length) + 1))
         #res = np.logspace(np.log10(0.01), np.log10(max(self.tokens_by_frequency)))
+        x_distance = min(max(self.tokens_by_frequency), 15)
         res = [n for n in range(0, 
                                 max(self.tokens_by_frequency), 
-                                int(max(self.tokens_by_frequency)/15)
+                                int(max(self.tokens_by_frequency)/x_distance)
                                 )
                ]
         plt.xticks(res)
@@ -290,9 +291,10 @@ class IndBibleStatistics(object):
         
         plt.xticks(range(max(self.tok_freq_by_length) + 1))
         #res = np.logspace(np.log10(0.01), np.log10(max(self.tokens_by_frequency)))
+        y_distance = min(max(self.tokens_by_frequency), 15)
         res = [n for n in range(0, 
                                 max(self.tokens_by_frequency), 
-                                int(max(self.tokens_by_frequency)/15)
+                                int(max(self.tokens_by_frequency)/y_distance)
                                 )
                ]
         plt.yticks(res)
