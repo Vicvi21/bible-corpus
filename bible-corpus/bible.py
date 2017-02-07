@@ -64,9 +64,12 @@ class Verse(object):
             res[token] = res.get(token, 0) + 1
         return res
     
-    def char_frequency(self):
+    def char_frequency(self, lower_case=True):
         res = {}
-        chars = list(self.text)
+        if lower_case:
+            chars = list(self.text.lower())
+        else:
+            chars = list(self.text)
         for char in chars:
             res[char] = res.get(char, 0) + 1
         return res

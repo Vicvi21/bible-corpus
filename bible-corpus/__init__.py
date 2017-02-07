@@ -9,21 +9,22 @@ from generate import RandomBible
 
 
 source_dirs = ["../bibles/Usable/",
-               "../bibles/Random/",
-               "../bibles/Random_Space_Char/",
+               "../bibles/Random_SAME_FLEN/",
+               "../bibles/Random_GEOM_LEN/",
                "../bibles/Testing/"]
 
 parent_dirs = ["Usable/",
-               "Random/",
-               "Random_Space_Char/",
+               "Random_SAME_FLEN/",
+               "Random_GEOM_LEN/",
                "Testing/"]
 
 # Configuration
-selected_dir = 2
-generate_random = False
+selected_dir = 0
+generate_random = True
 generate_whitespace_random = False
-make_plots = True
-process_stats = True
+make_plots = False
+process_stats = False
+single_bible = False
 
 bibles = BibleGroup()
 
@@ -49,14 +50,15 @@ for _, _, filenames in os.walk(source_dirs[selected_dir]):
         
         if generate_random:
             random_bible = RandomBible.create_xml_from(new_bible,
-                                                       source_dirs[1],
-                                                       False)
+                                                       source_dirs[1])
             
         if generate_whitespace_random:
             random_whitespace_bibles = RandomBible.create_xml_from(
                                                                 new_bible,
                                                                 source_dirs[2],
                                                                 True)
+        if single_bible:
+            break
         
 if process_stats:
     dataframe = bibles.to_dataframe()
