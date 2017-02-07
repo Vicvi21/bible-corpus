@@ -40,7 +40,9 @@ class Verse(object):
         temp_text = re.sub(r'[^\w\s]', 
                            '', 
                            self.text, 
-                           re.UNICODE).lower()
+                           re.UNICODE).replace("\t", 
+                                               "").replace("\n", 
+                                                           "").lower()
         temp = temp_text.split(" ")
         while '' in temp:
             temp.remove('')
@@ -64,7 +66,7 @@ class Verse(object):
             res[token] = res.get(token, 0) + 1
         return res
     
-    def char_frequency(self, lower_case=True):
+    def char_frequency(self, lower_case):
         res = {}
         if lower_case:
             chars = list(self.text.lower())
@@ -121,10 +123,10 @@ class Chapter(object):
                 res[key] = res.get(key, 0) + partial_freq[key]
         return res
     
-    def char_frequency(self):
+    def char_frequency(self, lower_case):
         res = {}
         for verse in self.verses:
-            partial_freq = verse.char_frequency()
+            partial_freq = verse.char_frequency(lower_case)
             for key in partial_freq.keys():
                 res[key] = res.get(key, 0) + partial_freq[key]
         return res
@@ -173,10 +175,10 @@ class Book(object):
                 res[key] = res.get(key, 0) + partial_freq[key]
         return res
     
-    def char_frequency(self):
+    def char_frequency(self, lower_case):
         res = {}
         for chapter in self.chapters:
-            partial_freq = chapter.char_frequency()
+            partial_freq = chapter.char_frequency(lower_case)
             for key in partial_freq.keys():
                 res[key] = res.get(key, 0) + partial_freq[key]
         return res
@@ -488,10 +490,10 @@ class Bible(IndBibleStatistics):
                                   reverse=True)
                            )
     
-    def char_frequency(self, *book_ids):
+    def char_frequency(self, lower_case, *book_ids):
         res = {}
         for book in self.books.books_with_id(*book_ids):
-            partial_freq = book.char_frequency()
+            partial_freq = book.char_frequency(lower_case)
             for key in partial_freq.keys():
                 res[key] = res.get(key, 0) + partial_freq[key]
         return OrderedDict(sorted(res.items(), 

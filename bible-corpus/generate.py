@@ -9,66 +9,15 @@ except ImportError:
 
 import re
 import random
-
+from bible import Bible
 
 class RandomBible(object):
 
     @classmethod
-    def create_xml_from_deprecated(cls,
-                        bible, 
-                        results_folder, 
-                        space_as_char):
-        
-        unique_chars = bible.unique_chars
-        original_path = bible.file_path
-        
-        xml_tree = ET.ElementTree(file=original_path)
-        
-        xml_root = xml_tree.getroot()
-        xml_header, xml_text = xml_root.getchildren()
-        
-        language_info = xml_header.find("profileDesc"
-                                        ).find("langUsage"
-                                               ).find("language")
-                                               
-        original_language = language_info.text
-        stripped_language = original_language.strip()
-        new_language = stripped_language + " random"
-        if space_as_char:
-            new_language += "(space as character)"
-        language_info.text = original_language.rstrip().replace(
-                                                            stripped_language, 
-                                                            "") + \
-                             new_language + \
-                             original_language.lstrip().replace(
-                                                            stripped_language, 
-                                                            "")
-        
-        language_info.attrib["iso639"] = language_info.attrib["iso639"] + \
-                                                                        "_rdm"
-        language_info.attrib["id"] = language_info.attrib["id"] + "_rdm"
-        
-        for book in xml_text.getchildren()[0]:
-            if book.attrib.get("type", "") == "book" :
-                for chapter in book:
-                    if chapter.attrib.get("type", "") == "chapter" :
-                        for verse in chapter:
-                            if verse.attrib.get("type", "") == "verse" :
-                                try:
-                                    verse.text = RandomBible.substitute_verse(
-                                                                verse.text, 
-                                                                unique_chars,
-                                                                space_as_char)
-                                except:
-                                    pass
-        results_path = results_folder + new_language + ".xml"
-        xml_tree.write(results_path, encoding="unicode")
-        return results_path
-
-    @classmethod
     def create_xml_from(cls,
                         bible, 
-                        results_folder):
+                        results_folder,
+                        model=None):
         
         # Don't get unique chars
         unique_chars = bible.unique_chars
@@ -86,7 +35,10 @@ class RandomBible(object):
         original_language = language_info.text
         stripped_language = original_language.strip()
         new_language = stripped_language + " random"
-        new_language += "(keeps long_char frequency)"
+        if model=="geomlen":
+            new_language += "(geometric length)"
+        else:
+            new_language += "(keeps long_char frequency)"
         language_info.text = original_language.rstrip().replace(
                                                             stripped_language, 
                                                             "") + \
@@ -99,12 +51,21 @@ class RandomBible(object):
                                                                         "_rdm"
         language_info.attrib["id"] = language_info.attrib["id"] + "_rdm"
         
+        if model=="geomlen":
+            unique_chars.add(" ")
+        
         # Dictionary of counter chars
         char_bag = RandomBible.count_character(unique_chars,
                                                xml_text)
+
+        if model == "geomlen":
+            # generate with geometrical distribution of length
+            uniform_bag = RandomBible.to_uniform_bag(char_bag)
+            RandomBible.substitute_words(uniform_bag, xml_text)
+        else:
+            # Scramble characters
+            RandomBible.scramble_verses(char_bag, xml_text)
         
-        # Scramble characters
-        RandomBible.scramble_verses(char_bag, xml_text)
         print("Finished: " + new_language)
         
         results_path = results_folder + new_language + ".xml"
@@ -165,11 +126,36 @@ class RandomBible(object):
                                         else:
                                             new_verse += character
                             verse.text = new_verse
+                            
+    @classmethod
+    def substitute_words(cls, uniform_bag, xml_text):
+        for book in xml_text.getchildren()[0]:
+            if book.attrib.get("type", "") == "book":
+                for chapter in book:
+                    if chapter.attrib.get("type", "") == "chapter" :
+                        for verse in chapter:
+                            new_verse = ""
+                            if verse.attrib.get("type", "") == "verse" :
+                                if verse.text:
+                                    qty_words = len(RandomBible.tokenize(verse.text))
+                                    new_words = []
+                                    current_word = ""
+                                    while len(new_words) < qty_words:
+                                        new_character = random.sample(
+                                                                uniform_bag,
+                                                                1)[0]
+                                        if new_character != " ":
+                                            current_word += new_character
+                                        else:
+                                            if len(current_word) > 0:
+                                                new_words.append(current_word)
+                                                current_word = ""
+                                    verse.text = " ".join(new_words)
     
     @classmethod
     def to_uniform_bag(cls, char_bag):
         bag = []
-        for character, freq in char_bag.keys():
+        for character, freq in char_bag.items():
             for _ in range(freq):
                 bag.append(character)
         return bag
@@ -220,3 +206,17 @@ class RandomBible(object):
             else:
                 new_verse += letter
         return new_verse
+    
+    @classmethod
+    def tokenize(self, verse):
+        temp_text = re.sub(r'[^\w\s]', 
+                           '', 
+                           verse, 
+                           re.UNICODE).replace("\t", 
+                                               "").replace("\n", 
+                                                           "").lower()
+
+        temp = temp_text.split(" ")
+        while '' in temp:
+            temp.remove('')
+        return temp

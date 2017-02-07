@@ -20,11 +20,11 @@ parent_dirs = ["Usable/",
 
 # Configuration
 selected_dir = 0
-generate_random = True
-generate_whitespace_random = False
+generate_random = False
+generate_geomlen = True
 make_plots = False
 process_stats = False
-single_bible = False
+single_bible = True
 
 bibles = BibleGroup()
 
@@ -52,11 +52,11 @@ for _, _, filenames in os.walk(source_dirs[selected_dir]):
             random_bible = RandomBible.create_xml_from(new_bible,
                                                        source_dirs[1])
             
-        if generate_whitespace_random:
-            random_whitespace_bibles = RandomBible.create_xml_from(
-                                                                new_bible,
-                                                                source_dirs[2],
-                                                                True)
+        if generate_geomlen:
+            random_whitespace_bibles = RandomBible.create_xml_from(new_bible,
+                                                                   source_dirs[2],
+                                                                   "geomlen")
+            
         if single_bible:
             break
         

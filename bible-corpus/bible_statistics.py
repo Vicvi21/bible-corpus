@@ -19,9 +19,9 @@ psych = importr("psych")
 
 class IndBibleStatistics(object):
     
-    def __init__(self):
+    def __init__(self, lower_case=True):
 
-        self.char_frequency = self.char_frequency()
+        self.char_frequency = self.char_frequency(lower_case)
         
         self.tok_frequency = self.token_frequency()
         self.tok_freq_by_length = self.calculate_token_frequencies_by_length()
