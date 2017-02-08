@@ -19,7 +19,7 @@ parent_dirs = ["Usable/",
                "Testing/"]
 
 # Configuration
-selected_dir = 0
+selected_dir = 2
 generate_random = False
 generate_geomlen = False
 make_plots = False
