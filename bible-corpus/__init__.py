@@ -19,15 +19,16 @@ parent_dirs = ["Usable/",
                "Testing/"]
 
 # Configuration
-selected_dir = 2
+selected_dir = 0
 generate_random = False
 generate_geomlen = False
-make_plots = True
+make_plots = False
 process_stats = True
 single_bible = False
-
+MAX = 4
 bibles = BibleGroup()
 
+i=0
 for _, _, filenames in os.walk(source_dirs[selected_dir]):
     for filename in filenames:
         new_bible = Bible.from_path(source_dirs[selected_dir] + filename)
@@ -57,8 +58,9 @@ for _, _, filenames in os.walk(source_dirs[selected_dir]):
                                                                    source_dirs[2],
                                                                    "geomlen")
             
-        if single_bible:
+        if single_bible and i == MAX:
             break
+        i += 1
         
 if process_stats:
     dataframe = bibles.to_dataframe()

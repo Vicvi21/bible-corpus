@@ -459,12 +459,26 @@ class BibleGroup(object):
                                     "P_StrLen_VarFreq",
                                     "Rho_Freq_StrLen", 
                                     "P_Freq_StrLen",
-                                    "Rho_Freq_VarStrLen",
-                                    "P_Freq_VarStrLen",
-                                    "Rho_Freq_MeanStrLen",
-                                    "P_Freq_MeanStrLen",
-                                    "Fisher_z_Freq_VarStrLen_MeanStrLen",
-                                    "Fisher_p_Freq_VarStrLen_MeanStrLen"
+                                    
+                                    "Rho_Freq_VarStrLen_NOVAR0",
+                                    "P_Freq_VarStrLen_NOVAR0",
+                                    "Rho_Freq_MeanStrLen_NOVAR0",
+                                    "P_Freq_MeanStrLen_NOVAR0",
+                                    "Rho_VarStrLen_MeanStrLen_NOVAR0",
+                                    "P_VarStrLen_MeanStrLen_NOVAR0",
+                                    
+                                    "Steiger_t_Freq_VarStrLen_MeanStrLen_NOVAR0",
+                                    "Steiger_p_Freq_VarStrLen_MeanStrLen_NOVAR0",
+                                    
+                                    "Rho_Freq_VarStrLen_VAR0",
+                                    "P_Freq_VarStrLen_VAR0",
+                                    "Rho_Freq_MeanStrLen_VAR0",
+                                    "P_Freq_MeanStrLen_VAR0",
+                                    "Rho_VarStrLen_MeanStrLen_VAR0",
+                                    "P_VarStrLen_MeanStrLen_VAR0",
+                                    
+                                    "Steiger_t_Freq_VarStrLen_MeanStrLen_VAR0",
+                                    "Steiger_p_Freq_VarStrLen_MeanStrLen_VAR0"
                                     ])
         
         for bible in self.bibles:
@@ -497,21 +511,71 @@ class BibleGroup(object):
             row_res["Rho_Freq_StrLen"] = sper_freq_len_dset[0]
             row_res["P_Freq_StrLen"] = sper_freq_len_dset[1]
             
-            # X frequency Y length_variance
+            # X frequency Y length_variance when varstrlen is None
             dataset = [(frequency, l_variance) for frequency, l_variance in \
                                             bible.variance_by_tok_freq.items()
                                             if l_variance != None]
             
-            len_dataset12 = len(dataset)
             freq_lvar_dset = np.array(sorted(dataset))
             sper_freq_lvar_dset = self.spearmanr(freq_lvar_dset[:, 0], 
                                                  freq_lvar_dset[:, 1], 
                                                  True)
             
-            row_res["Rho_Freq_VarStrLen"] = sper_freq_lvar_dset[0]
-            row_res["P_Freq_VarStrLen"] = sper_freq_lvar_dset[1]
+            row_res["Rho_Freq_VarStrLen_NOVAR0"] = sper_freq_lvar_dset[0]
+            row_res["P_Freq_VarStrLen_NOVAR0"] = sper_freq_lvar_dset[1]
             
-            # X frequencies Y Mean Lengths
+            # X frequencies Y Mean Lengths when varstrlen is None
+            dataset = []
+            for freq, tokens in bible.tokens_by_frequency.items():
+                if bible.variance_by_tok_freq[freq] != None: # Variance is None
+                    len_values = []
+                    for token in tokens:
+                        len_values.append(len(token))
+                    mean_val = statistics.mean(len_values)
+                    dataset.append((freq, mean_val))
+            
+            freq_mlen_dset = np.array(sorted(dataset))
+            sper_freq_mlen_dset = self.spearmanr(freq_mlen_dset[:, 0], 
+                                                freq_mlen_dset[:, 1], 
+                                                True)
+            
+            row_res["Rho_Freq_MeanStrLen_NOVAR0"] = sper_freq_mlen_dset[0]
+            row_res["P_Freq_MeanStrLen_NOVAR0"] = sper_freq_mlen_dset[1]
+            
+            # X length_variance Y mean lengths when varstrlen is None
+            lvar_mlen_dset = np.column_stack((freq_lvar_dset[:, 1],
+                                              freq_mlen_dset[:, 1]))
+            sper_lvar_mlen_dset = self.spearmanr(lvar_mlen_dset[:, 0],
+                                                 lvar_mlen_dset[:, 1],
+                                                 True)
+            row_res["Rho_VarStrLen_MeanStrLen_NOVAR0"] = sper_lvar_mlen_dset[0]
+            row_res["P_VarStrLen_MeanStrLen_NOVAR0"] = sper_lvar_mlen_dset[1]
+            
+            # Steiger's Z
+            steiger = psych.r_test(n=len(lvar_mlen_dset), 
+                                   r12=row_res["Rho_Freq_VarStrLen_NOVAR0"], 
+                                   r13=row_res["Rho_Freq_MeanStrLen_NOVAR0"], 
+                                   r23=row_res["Rho_VarStrLen_MeanStrLen_NOVAR0"]
+                                   )
+            row_res["Steiger_t_Freq_VarStrLen_MeanStrLen_NOVAR0"] = steiger[2][0]
+            row_res["Steiger_p_Freq_VarStrLen_MeanStrLen_NOVAR0"] = steiger[3][0]
+
+            
+            ########
+            # X frequency Y length_variance varstrl as zero
+            dataset = [(frequency, l_variance) for frequency, l_variance in \
+                                            bible.variance_by_tok_freq.items()]
+            
+            freq_lvar_dset = np.nan_to_num(np.array(sorted(dataset), 
+                                                    dtype=np.float)
+                                           )
+            sper_freq_lvar_dset = self.spearmanr(freq_lvar_dset[:, 0], 
+                                                 freq_lvar_dset[:, 1], 
+                                                 True)
+            row_res["Rho_Freq_VarStrLen_VAR0"] = sper_freq_lvar_dset[0]
+            row_res["P_Freq_VarStrLen_VAR0"] = sper_freq_lvar_dset[1]
+            
+            # X frequencies Y Mean Lengths varstrl as zero
             dataset = []
             for freq, tokens in bible.tokens_by_frequency.items():
                 len_values = []
@@ -520,25 +584,32 @@ class BibleGroup(object):
                 mean_val = statistics.mean(len_values)
                 dataset.append((freq, mean_val))
             
-            len_dataset13 = len(dataset)
             freq_mlen_dset = np.array(sorted(dataset))
             sper_freq_mlen_dset = self.spearmanr(freq_mlen_dset[:, 0], 
                                                 freq_mlen_dset[:, 1], 
                                                 True)
             
-            row_res["Rho_Freq_MeanStrLen"] = sper_freq_mlen_dset[0]
-            row_res["P_Freq_MeanStrLen"] = sper_freq_mlen_dset[1]
+            row_res["Rho_Freq_MeanStrLen_VAR0"] = sper_freq_mlen_dset[0]
+            row_res["P_Freq_MeanStrLen_VAR0"] = sper_freq_mlen_dset[1]
+            
+            # X length_variance Y mean lengths varstrl as zero
+            lvar_mlen_dset = np.column_stack((freq_lvar_dset[:, 1],
+                                              freq_mlen_dset[:, 1]))
+            sper_lvar_mlen_dset = self.spearmanr(lvar_mlen_dset[:, 0],
+                                                 lvar_mlen_dset[:, 1],
+                                                 True)
+            row_res["Rho_VarStrLen_MeanStrLen_VAR0"] = sper_lvar_mlen_dset[0]
+            row_res["P_VarStrLen_MeanStrLen_VAR0"] = sper_lvar_mlen_dset[1]
             
             # Steiger's Z
-            steiger = psych.r_test(len_dataset12, 
-                                   row_res["Rho_Freq_VarStrLen"], 
-                                   row_res["Rho_Freq_MeanStrLen"], 
-                                   n2=len_dataset13
+            steiger = psych.r_test(n=len(lvar_mlen_dset), 
+                                   r12=row_res["Rho_Freq_VarStrLen_VAR0"], 
+                                   r13=row_res["Rho_Freq_MeanStrLen_VAR0"], 
+                                   r23=row_res["Rho_VarStrLen_MeanStrLen_VAR0"]
                                    )
-            
-            row_res["Fisher_z_Freq_VarStrLen_MeanStrLen"] = steiger[2][0]
-            row_res["Fisher_p_Freq_VarStrLen_MeanStrLen"] = steiger[3][0]
-            
+            row_res["Steiger_t_Freq_VarStrLen_MeanStrLen_VAR0"] = steiger[2][0]
+            row_res["Steiger_p_Freq_VarStrLen_MeanStrLen_VAR0"] = steiger[3][0]
+                        
             res.loc[bible.language] = pd.Series(row_res)
         
         return res
