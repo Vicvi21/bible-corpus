@@ -19,12 +19,12 @@ parent_dirs = ["Usable/",
                "Testing/"]
 
 # Configuration
-selected_dir = 0
+selected_dir = 2
 generate_random = False
-generate_geomlen = True
-make_plots = False
-process_stats = False
-single_bible = True
+generate_geomlen = False
+make_plots = True
+process_stats = True
+single_bible = False
 
 bibles = BibleGroup()
 
