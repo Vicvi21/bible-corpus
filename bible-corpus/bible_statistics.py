@@ -455,11 +455,11 @@ class BibleGroup(object):
         
         df = self.to_dataframe()
         
-        res = pd.DataFrame(columns=["Rho_StrLen_VarFreq", 
-                                    "P_StrLen_VarFreq",
-                                    "Rho_Freq_StrLen", 
+        res = pd.DataFrame(columns=["Rho_Freq_StrLen", 
                                     "P_Freq_StrLen",
                                     
+                                    "Rho_StrLen_VarFreq_NOVAR0", 
+                                    "P_StrLen_VarFreq_NOVAR0",
                                     "Rho_Freq_VarStrLen_NOVAR0",
                                     "P_Freq_VarStrLen_NOVAR0",
                                     "Rho_Freq_MeanStrLen_NOVAR0",
@@ -470,6 +470,8 @@ class BibleGroup(object):
                                     "Steiger_t_Freq_VarStrLen_MeanStrLen_NOVAR0",
                                     "Steiger_p_Freq_VarStrLen_MeanStrLen_NOVAR0",
                                     
+                                    "Rho_StrLen_VarFreq_VAR0", 
+                                    "P_StrLen_VarFreq_VAR0",
                                     "Rho_Freq_VarStrLen_VAR0",
                                     "P_Freq_VarStrLen_VAR0",
                                     "Rho_Freq_MeanStrLen_VAR0",
@@ -484,19 +486,6 @@ class BibleGroup(object):
         for bible in self.bibles:
             row_res = {}
             
-            # X length Y frequency variance 
-            dataset = [(token_length, f_variance) for token_length, f_variance in \
-                                        bible.variance_by_tok_length.items()\
-                                        if f_variance != None]
-            
-            len_fvar_dset = np.array(sorted(dataset))
-            sper_len_fvar_dset = self.spearmanr(len_fvar_dset[:, 0], 
-                                                len_fvar_dset[:, 1], 
-                                                True)
-            
-            row_res["Rho_StrLen_VarFreq"] = sper_len_fvar_dset[0]
-            row_res["P_StrLen_VarFreq"] = sper_len_fvar_dset[1]
-            
             # X frequencies Y lengths 
             dataset = []
             for freq, tokens in bible.tokens_by_frequency.items():
@@ -510,6 +499,20 @@ class BibleGroup(object):
             
             row_res["Rho_Freq_StrLen"] = sper_freq_len_dset[0]
             row_res["P_Freq_StrLen"] = sper_freq_len_dset[1]
+
+            # X length Y frequency variance is None
+            dataset = [(token_length, f_variance) for token_length, f_variance in \
+                                        bible.variance_by_tok_length.items()\
+                                        if f_variance != None]
+            
+            len_fvar_dset = np.array(sorted(dataset))
+            sper_len_fvar_dset = self.spearmanr(len_fvar_dset[:, 0], 
+                                                len_fvar_dset[:, 1], 
+                                                True)
+            
+            row_res["Rho_StrLen_VarFreq_NOVAR0"] = sper_len_fvar_dset[0]
+            row_res["P_StrLen_VarFreq_NOVAR0"] = sper_len_fvar_dset[1]
+
             
             # X frequency Y length_variance when varstrlen is None
             dataset = [(frequency, l_variance) for frequency, l_variance in \
@@ -562,6 +565,21 @@ class BibleGroup(object):
 
             
             ########
+            
+            # X length Y frequency variance as zero
+            dataset = [(token_length, f_variance) for token_length, f_variance in \
+                                        bible.variance_by_tok_length.items()]
+            
+            len_fvar_dset = np.nan_to_num(np.array(sorted(dataset),
+                                                   dtype=np.float)
+                                           )
+            sper_len_fvar_dset = self.spearmanr(len_fvar_dset[:, 0], 
+                                                len_fvar_dset[:, 1], 
+                                                True)
+            
+            row_res["Rho_StrLen_VarFreq_VAR0"] = sper_len_fvar_dset[0]
+            row_res["P_StrLen_VarFreq_VAR0"] = sper_len_fvar_dset[1]
+            
             # X frequency Y length_variance varstrl as zero
             dataset = [(frequency, l_variance) for frequency, l_variance in \
                                             bible.variance_by_tok_freq.items()]
