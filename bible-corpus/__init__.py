@@ -19,11 +19,11 @@ parent_dirs = ["Usable/",
                "Testing/"]
 
 # Configuration
-selected_dir = 2
+selected_dir = 1
 generate_random = False
 generate_geomlen = False
-make_plots = False
-process_stats = True
+make_plots = True
+process_stats = False
 single_bible = False
 MAX = 4
 bibles = BibleGroup()
@@ -44,10 +44,22 @@ for _, _, filenames in os.walk(source_dirs[selected_dir]):
         if make_plots:
             plot_folder = "../plots/" + parent_dirs[selected_dir]
             new_bible.plot_freq_long(plot_folder=plot_folder)
-            new_bible.plot_freq_varlong(plot_folder=plot_folder)
+            print("\t\t finished plot_freq_long")
+            new_bible.plot_freq_varlong_novar(plot_folder=plot_folder)
+            print("\t\t finished plot_freq_varlong_novar")
+            new_bible.plot_freq_varlong_var0(plot_folder=plot_folder)
+            print("\t\t finished plot_freq_varlong_var0")
             new_bible.plot_long_freq(plot_folder=plot_folder)
-            new_bible.plot_long_varfreq(plot_folder=plot_folder)
-            new_bible.plot_freq_meanlong(plot_folder=plot_folder)
+            print("\t\t finished plot_long_freq")
+            new_bible.plot_long_varfreq_novar(plot_folder=plot_folder)
+            print("\t\t finished plot_long_varfreq_novar")
+            new_bible.plot_long_varfreq_var0(plot_folder=plot_folder)
+            print("\t\t finished plot_long_varfreq_var0")
+            new_bible.plot_freq_meanlong_var0(plot_folder=plot_folder)
+            print("\t\t finished plot_freq_meanlong_var0")
+            new_bible.plot_freq_meanlong_novar(plot_folder=plot_folder)
+            print("\t\t finished plot_freq_meanlong_novar")
+            
         
         if generate_random:
             random_bible = RandomBible.create_xml_from(new_bible,

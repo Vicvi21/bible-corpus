@@ -206,9 +206,73 @@ class IndBibleStatistics(object):
         plt.close()
         gc.collect()
     
-    def plot_freq_meanlong(self, annotated=False, save=True,
+    def plot_freq_meanlong_novar(self, annotated=False, save=True,
                            plot_folder="../plots/", 
-                           sub_folder="freq_meanlong/"):
+                           sub_folder="freq_meanlong_novar/"):
+        folder = plot_folder + sub_folder
+        dataset = []
+        for freq, tokens in self.tokens_by_frequency.items():
+            if self.variance_by_tok_freq[freq] != None: # Variance is None
+                len_values = []
+                for token in tokens:
+                    len_values.append(len(token))
+                mean_val = statistics.mean(len_values)
+                dataset.append((freq, mean_val))
+                
+
+        if save:
+            fig = plt.figure(figsize=(11.69, 8.27))
+        
+        # X frequency Y mean length 
+        ndataset = np.array(sorted(dataset))
+        plt.bar(np.array(ndataset[:, 0], dtype=np.int32), 
+                np.array(ndataset[:, 1], dtype=np.float32))
+        
+        plt.ylabel("Mean of Token Lengths")
+        plt.xlabel("Token Frequency")
+        plt.title(self.language)
+        plt.xlim(xmin=0)
+        plt.ylim(ymin=0)
+        if save:
+            plt.savefig(folder + self.language)
+            fig.clf()
+        else:
+            plt.show()
+        plt.close()
+        gc.collect()
+            
+    def plot_freq_varlong_novar(self, save=True, 
+                          plot_folder="../plots/", 
+                          sub_folder="freq_varlong_novar/"):
+        folder = plot_folder + sub_folder
+        dataset = [(frequency, l_variance) for frequency, l_variance in \
+                                            self.variance_by_tok_freq.items()
+                                            if l_variance != None]
+        
+        if save:
+            fig = plt.figure(figsize=(11.69, 8.27))
+        
+        # X frequency Y length 
+        ndataset = np.array(dataset)
+        plt.bar(np.array(ndataset[:, 0], dtype=np.int32), 
+                np.array(ndataset[:, 1], dtype=np.float32))
+        
+        plt.ylabel("Variance of Token Lengths by Frequency")
+        plt.xlabel("Token Frequency")
+        plt.title(self.language)
+        plt.xlim(xmin=0)
+        plt.ylim(ymin=0)
+        if save:
+            plt.savefig(folder + self.language)
+            fig.clf()
+        else:
+            plt.show()
+        plt.close()
+        gc.collect()
+        
+    def plot_freq_meanlong_var0(self, annotated=False, save=True,
+                           plot_folder="../plots/", 
+                           sub_folder="freq_meanlong_var0/"):
         folder = plot_folder + sub_folder
         dataset = []
         for freq, tokens in self.tokens_by_frequency.items():
@@ -224,7 +288,7 @@ class IndBibleStatistics(object):
         # X frequency Y mean length 
         ndataset = np.array(sorted(dataset))
         plt.bar(np.array(ndataset[:, 0], dtype=np.int32), 
-                np.array(ndataset[:, 1], dtype=np.int32))
+                np.array(ndataset[:, 1], dtype=np.float32))
         
         plt.ylabel("Mean of Token Lengths")
         plt.xlabel("Token Frequency")
@@ -239,13 +303,15 @@ class IndBibleStatistics(object):
         plt.close()
         gc.collect()
             
-    def plot_freq_varlong(self, save=True, 
+    def plot_freq_varlong_var0(self, save=True, 
                           plot_folder="../plots/", 
-                          sub_folder="freq_varlong/"):
+                          sub_folder="freq_varlong_var0/"):
         folder = plot_folder + sub_folder
         dataset = [(frequency, l_variance) for frequency, l_variance in \
-                                            self.variance_by_tok_freq.items()
-                                            if l_variance != None]
+                                            self.variance_by_tok_freq.items()]
+        dataset = np.nan_to_num(np.array(sorted(dataset),
+                                         dtype=np.float)
+                                )
         
         if save:
             fig = plt.figure(figsize=(11.69, 8.27))
@@ -253,7 +319,7 @@ class IndBibleStatistics(object):
         # X frequency Y length 
         ndataset = np.array(dataset)
         plt.bar(np.array(ndataset[:, 0], dtype=np.int32), 
-                np.array(ndataset[:, 1], dtype=np.int32))
+                np.array(ndataset[:, 1], dtype=np.float32))
         
         plt.ylabel("Variance of Token Lengths by Frequency")
         plt.xlabel("Token Frequency")
@@ -327,9 +393,9 @@ class IndBibleStatistics(object):
         plt.close()
         gc.collect()
         
-    def plot_long_varfreq(self, save=True, 
+    def plot_long_varfreq_novar(self, save=True, 
                           plot_folder="../plots/", 
-                          sub_folder="long_varfreq/"):
+                          sub_folder="long_varfreq_novar/"):
         folder = plot_folder + sub_folder
 
         dataset = [(token_length, f_variance) for token_length, f_variance in \
@@ -343,7 +409,40 @@ class IndBibleStatistics(object):
         # Y varfrequency X length 
         ndataset = np.array(dataset)
         plt.bar(np.array(ndataset[:, 0], dtype=np.int32), 
-                np.array(ndataset[:, 1], dtype=np.int32))
+                np.array(ndataset[:, 1], dtype=np.float32))
+        
+        plt.xlabel("Token Length")
+        plt.ylabel("Variance of Token Frequency by Length")
+        plt.title(self.language)
+        plt.ylim(ymin=0)
+        plt.xlim(xmin=0)
+        if save:
+            plt.savefig(folder + self.language)
+            fig.clf()
+        else:
+            plt.show()
+        plt.close()
+        gc.collect()
+        
+    def plot_long_varfreq_var0(self, save=True, 
+                          plot_folder="../plots/", 
+                          sub_folder="long_varfreq_var0/"):
+        folder = plot_folder + sub_folder
+
+        dataset = [(token_length, f_variance) for token_length, f_variance in \
+                                        self.variance_by_tok_length.items()]
+        dataset = np.nan_to_num(np.array(sorted(dataset),
+                                         dtype=np.float)
+                                )
+            
+        if save:
+            fig = plt.figure(figsize=(11.69, 8.27))
+        
+        plt.xticks(range(max(self.variance_by_tok_length) + 1))
+        # Y varfrequency X length 
+        ndataset = np.array(dataset)
+        plt.bar(np.array(ndataset[:, 0], dtype=np.int32), 
+                np.array(ndataset[:, 1], dtype=np.float32))
         
         plt.xlabel("Token Length")
         plt.ylabel("Variance of Token Frequency by Length")
